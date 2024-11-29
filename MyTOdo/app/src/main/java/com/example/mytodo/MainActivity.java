@@ -33,55 +33,40 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     private FloatingActionButton fab;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //getSupportActionBar().hide();
         db = new DataBaseHandler(this);
         db.openDatabase();
 
-        tasksList = new ArrayList<>();
+        tasksList = db.getAllTasks();
+        Collections.reverse(tasksList);
 
         tasksRecylcerView = findViewById(R.id.TasksRecyclerView);
         tasksRecylcerView.setLayoutManager(new LinearLayoutManager(this));
-        tasksAdapter = new TodoAdapter(db,this);
+        tasksAdapter = new TodoAdapter(db, this);
         tasksRecylcerView.setAdapter(tasksAdapter);
 
         fab = findViewById(R.id.FAB);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AddNewTask.newInstance().show(getSupportFragmentManager(),AddNewTask.TAG);
+                AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
             }
         });
-        //ToDoModel task = new ToDoModel();
-        //task.setTask("This is a Test Task");
-        //task.setStatus(0);
-        //task.setId(1);
-        //tasksList.add(task);
-        //tasksList.add(task);
-        //tasksList.add(task);
-        //tasksList.add(task);
-        //tasksList.add(task);
 
-        tasksList = db.getAllTasks();
-        Collections.reverse(tasksList);
-        tasksAdapter.setTasks(tasksList);
-        //updating recycler view where we create that   set tasks function in the todoadapter
-        //tasksAdapter.setTasks(tasksList);
-
-
-
+        // Submit the reversed list instead of modifying it in place
+        List<ToDoModel> reversedList = new ArrayList<>(tasksList);
+        Collections.reverse(reversedList);
+        tasksAdapter.submitList(reversedList);
     }
+
     @Override
-    public void handleDialogClose(DialogInterface dialog){
+    public void handleDialogClose(DialogInterface dialog) {
         tasksList = db.getAllTasks();
         Collections.reverse(tasksList);
-        tasksAdapter.setTasks(tasksList);
-        tasksAdapter.notifyDataSetChanged(); //it wil uodat emy whole recyler view
-
-
+        tasksAdapter.submitList(new ArrayList<>(tasksList));
     }
+
 }

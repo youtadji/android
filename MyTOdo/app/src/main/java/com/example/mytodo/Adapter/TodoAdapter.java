@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mytodo.AddNewTask;
@@ -16,79 +19,82 @@ import com.example.mytodo.Model.ToDoModel;
 import com.example.mytodo.R;
 import com.example.mytodo.Utils.DataBaseHandler;
 
-import java.util.List;
+public class TodoAdapter extends ListAdapter<ToDoModel, TodoAdapter.ViewHolder> {
 
-public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
+    private MainActivity activity;
+    private DataBaseHandler db;
 
-        private List<ToDoModel> todoList;
-        private MainActivity activity;
-        private DataBaseHandler db;
+    public TodoAdapter(DataBaseHandler db, MainActivity activity) {
+        super(DIFF_CALLBACK);
+        this.db = db;
+        this.activity = activity;
+    }
 
-
-        public TodoAdapter (DataBaseHandler db,MainActivity activity){
-            this.db=db;
-            this.activity = activity;
+    private static final DiffUtil.ItemCallback<ToDoModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<ToDoModel>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull ToDoModel oldItem, @NonNull ToDoModel newItem) {
+            // Compare unique IDs
+            return oldItem.getId() == newItem.getId();
         }
 
-         public ViewHolder onCreateViewHolder(ViewGroup parent,int viewType){
-            View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.task_layout,parent,false);
-            return new ViewHolder(itemView);
+        @Override
+        public boolean areContentsTheSame(@NonNull ToDoModel oldItem, @NonNull ToDoModel newItem) {
+            // Compare the content
+            return oldItem.getTask().equals(newItem.getTask()) && oldItem.getStatus() == newItem.getStatus();
         }
+    };
 
-        public void onBindViewHolder(ViewHolder holder, int position){
-            db.openDatabase();
-            ToDoModel item = todoList.get(position);
-            holder.task.setText(item.getTask());
-            holder.task.setChecked(toBoolean(item.getStatus()));
-            holder.task.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                  if( b){
-                      db.updateStatus(item.getId(),1);
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.task_layout, parent, false);
+        return new ViewHolder(itemView);
+    }
 
-                  } else {
-                      db.updateStatus(item.getId(),0);
-                  }
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        db.openDatabase();
+        ToDoModel item = getItem(position);
+        holder.task.setText(item.getTask());
+        holder.task.setChecked(toBoolean(item.getStatus()));
+
+        holder.task.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    db.updateStatus(item.getId(), 1);
+                } else {
+                    db.updateStatus(item.getId(), 0);
                 }
-            });
-        }
-
-        public  int getItemCount(){
-            return todoList.size();
-        }
-
-        private boolean toBoolean(int n ){
-            return n!=0;
-        }
-
-        //this that updates my recyler view
-        public void setTasks(List<ToDoModel> todoList){
-            this.todoList = todoList;
-            notifyDataSetChanged();
-        }
-
-        public Context getContext(){
-            return activity;
-        }
-
-        public void editItem ( int position) {
-            ToDoModel item = todoList.get(position);
-            Bundle bundle = new Bundle();
-            bundle.putInt("id",item.getId());
-            bundle.putString("task",item.getTask());
-            AddNewTask fragment = new AddNewTask();
-            fragment.setArguments(bundle);
-            fragment.show(activity.getSupportFragmentManager(),AddNewTask.TAG);
-        }
-
-        public static class ViewHolder extends RecyclerView.ViewHolder{
-            CheckBox task;
-            ViewHolder( View view){
-                super(view);
-                task = view.findViewById(R.id.todoCheckBox);
             }
+        });
+    }
+
+    private boolean toBoolean(int n) {
+        return n != 0;
+    }
+
+    public Context getContext() {
+        return activity;
+    }
+
+    public void editItem(int position) {
+        ToDoModel item = getItem(position);
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", item.getId());
+        bundle.putString("task", item.getTask());
+        AddNewTask fragment = new AddNewTask();
+        fragment.setArguments(bundle);
+        fragment.show(activity.getSupportFragmentManager(), AddNewTask.TAG);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        CheckBox task;
+
+        ViewHolder(View view) {
+            super(view);
+            task = view.findViewById(R.id.todoCheckBox);
         }
-
-
+    }
 }
