@@ -19,6 +19,9 @@ import com.example.mytodo.Model.ToDoModel;
 import com.example.mytodo.R;
 import com.example.mytodo.Utils.DataBaseHandler;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class TodoAdapter extends ListAdapter<ToDoModel, TodoAdapter.ViewHolder> {
 
     private MainActivity activity;
@@ -77,6 +80,14 @@ public class TodoAdapter extends ListAdapter<ToDoModel, TodoAdapter.ViewHolder> 
 
     public Context getContext() {
         return activity;
+    }
+
+    public void deleteItem(int position){
+        ToDoModel item = getItem(position);
+        db.deleteTask(item.getId());
+        List<ToDoModel> currentList = new ArrayList<>(getCurrentList());
+        currentList.remove(position);
+        submitList(currentList);
     }
 
     public void editItem(int position) {

@@ -12,6 +12,9 @@ import com.example.mytodo.Model.ToDoModel;
 import java.util.ArrayList;
 import java.util.List;
 
+//update it to roomdatabase from sql , part of jetpack
+//sned data from one fragment to another maybe by click on this row that shows this ticket , nanivagtion component
+
 public class DataBaseHandler extends SQLiteOpenHelper {
 
     private static final int VERSION = 1;
