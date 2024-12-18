@@ -60,47 +60,60 @@ public class RecylcerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             adapter.editItem(position);
         }
     }
-    @Override
-    public void onChildDraw(Canvas c , RecyclerView recyclerView , RecyclerView.ViewHolder viewHolder , float dx, float dy ,int actionState , boolean isCurrentlyActive){
-        super.onChildDraw(c,recyclerView,viewHolder,dy,dy,actionState,isCurrentlyActive);
 
+    @Override
+    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                            float dx, float dy, int actionState, boolean isCurrentlyActive) {
+        super.onChildDraw(c, recyclerView, viewHolder, dx, dy, actionState, isCurrentlyActive);
+
+        View itemView = viewHolder.itemView;
         Drawable icon;
         ColorDrawable background;
-        View itemView = viewHolder.itemView;
-        int backgroundCOrnenrOffset= 20;
-        if (dx>0){
-            icon = ContextCompat.getDrawable(adapter.getContext(),R.drawable.baseline_edit);
+        int backgroundCornerOffset = 20;
+
+        int iconMargin = (itemView.getHeight() - 64) / 2;
+        int iconTop = itemView.getTop() + (itemView.getHeight() - 64) / 2;
+        int iconBottom = iconTop + 64;
+
+        if (dx > 0) {
+            // swiping to the right
+            icon = ContextCompat.getDrawable(adapter.getContext(), R.drawable.baseline_edit);
             background = new ColorDrawable(ContextCompat.getColor(adapter.getContext(), R.color.pastel_blue));
 
-        }else {
-            icon = ContextCompat.getDrawable(adapter.getContext(),R.drawable.baseline_delete_24);
-            background = new ColorDrawable(Color.RED);
-
-        }
-        int iconMargin= (itemView.getHeight()-icon.getIntrinsicHeight())/2;
-        int iconTop= itemView.getTop()+ (itemView.getHeight() - icon.getIntrinsicHeight())/2;
-        int iconBottom = iconTop+ icon.getIntrinsicHeight();
-
-        if (dx>0){ //swipes to right
-            int iconleft = itemView.getLeft()+ iconMargin;
-            int iconRight = itemView.getLeft()+ iconMargin+ icon.getIntrinsicWidth();
-            icon.setBounds(iconleft, iconTop, iconRight,iconBottom);
+            int iconLeft = itemView.getLeft() + iconMargin;
+            int iconRight = iconLeft + (icon != null ? icon.getIntrinsicWidth() : 64);
+            if (icon != null) icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
 
             background.setBounds(itemView.getLeft(), itemView.getTop(),
-                    itemView.getLeft()+ ((int)dx)+backgroundCOrnenrOffset,itemView.getBottom());
+                    itemView.getLeft() + ((int) dx) + backgroundCornerOffset,
+                    itemView.getBottom());
 
-        }else if (dx<0){ //Swipes to left
-            int iconleft = itemView.getRight() - iconMargin - icon.getIntrinsicWidth();
-            int iconRight = itemView.getRight() - iconMargin ;
-            icon.setBounds(iconleft, iconTop, iconRight,iconBottom);
+            background.draw(c);
+            if (icon != null) icon.draw(c);
 
-            background.setBounds(itemView.getRight(), ((int)dx) - backgroundCOrnenrOffset, itemView.getTop(),
-                    itemView.getRight()+ itemView.getBottom());
-        } else{
-            background.setBounds(0,0,0,0);
+        } else if (dx < 0) {
+            // swipes to the left
+            icon = ContextCompat.getDrawable(adapter.getContext(), R.drawable.baseline_delete_24);
+            background = new ColorDrawable(Color.RED);
 
+            int iconLeft = itemView.getRight() - iconMargin - (icon != null ? icon.getIntrinsicWidth() : 64);
+            int iconRight = itemView.getRight() - iconMargin;
+            if (icon != null) icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+
+            background.setBounds(itemView.getRight() + ((int) dx) - backgroundCornerOffset,
+                    itemView.getTop(),
+                    itemView.getRight(),
+                    itemView.getBottom());
+
+            background.draw(c);
+            if (icon != null) icon.draw(c);
+
+        } else {
+            // no swipe
+            background = new ColorDrawable(Color.TRANSPARENT);
+            background.setBounds(0, 0, 0, 0);
+            background.draw(c);
         }
-        background.draw(c);
-        icon.draw(c);
     }
+
 }
