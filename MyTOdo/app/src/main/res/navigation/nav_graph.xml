@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/todoListFragment">
+
+    <fragment
+        android:id="@+id/todoListFragment"
+        android:name="com.example.mytodo.TodoListFragment"
+        android:label="TodoListFragment">
+        <action
+            android:id="@+id/action_list_to_detail"
+            app:destination="@id/todoDetailFragment">
+            <argument
+                android:name="task_text"
+                app:argType="string" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/todoDetailFragment"
+        android:name="com.example.mytodo.TodoDetailFragment"
+        android:label="TodoDetailFragment">
+        <argument
+            android:name="task_text"
+            app:argType="string" />
+    </fragment>
+
+</navigation>

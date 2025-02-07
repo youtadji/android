@@ -17,6 +17,13 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    versionCatalogs {
+        create("libs") {
+            // Add this line
+            version("nav-version", "2.7.7")
+            plugin("navigation-safeargs", "androidx.navigation.safeargs.kotlin").versionRef("nav-version")
+        }
+    }
 }
 
 rootProject.name = "MyTOdo"

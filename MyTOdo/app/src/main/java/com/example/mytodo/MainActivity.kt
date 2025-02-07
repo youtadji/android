@@ -1,3 +1,4 @@
+/*
 package com.example.mytodo
 
 import android.content.DialogInterface
@@ -56,5 +57,40 @@ class MainActivity : AppCompatActivity(), DialogCloseListener {
         tasksList = db?.getAllTasks() ?: listOf()
         Collections.reverse(tasksList)
         tasksAdapter?.submitList(ArrayList(tasksList))
+    }
+}
+*/
+package com.example.mytodo
+
+import android.content.DialogInterface
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+
+class MainActivity : AppCompatActivity(), DialogCloseListener {
+    private lateinit var navController: NavController
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main_nav)
+
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+    }
+
+    override fun handleDialogClose(dialog: DialogInterface?) {
+        // Find the current fragment and forward the dialog close event
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.childFragmentManager?.fragments?.get(0)
+        if (currentFragment is DialogCloseListener) {
+            currentFragment.handleDialogClose(dialog)
+        }
+    }
+
+    fun navigateToDetail(taskText: String) {
+        val action = TodoListFragmentDirections.actionListToDetail(taskText)
+        navController.navigate(action)
     }
 }
